@@ -37,17 +37,17 @@ def BotMessage(message):
         time.sleep(0.03)
     print()
 
-def UserInput():
+def UserInput(): #recieve user msg
     global messages
     messages += 1
     return input(f"👤 {userName}: ")
 
-def show_help():
+def show_help():  #shows bot funcs
     seperator()
     BotMessage("Here are some things you can ask me:")
     print("tell a joke \n ask a riddle \n play games \n calculate a number(end the equation in '=') \n analyze your mood \n you can say 'help' to see this message again \n you can say 'exit' to end the conversation")
 
-def GreetUser():
+def GreetUser(): #runs on start; gets user name
     global userName
     greeting = random.choice(greetings)
     BotMessage(f"{greeting} I'm {botName}, your friendly chatbot!")
@@ -55,12 +55,12 @@ def GreetUser():
     userName = input("👤 You: ")
     BotMessage(f"Nice to meet you, {userName}! How can I assist you today?")
 
-def TellJoke():
+def TellJoke(): #pulls a joke from the joke list and prints it
     seperator()
     joke = random.choice(jokes)
     BotMessage(joke)
 
-def AskRiddle():
+def AskRiddle(): #pulls a riddle from the riddle list and remember the index for the answer
     seperator()
     index = random.randint(0, len(riddlesQuestions) - 1)
     BotMessage(riddlesQuestions[index])
@@ -68,33 +68,33 @@ def AskRiddle():
     UserInput()
     BotMessage(riddlesAnswers[index])
 
-def NumberGuessingGame():
+def NumberGuessingGame(): 
     seperator()
     BotMessage("Welcome to the Number Guessing Game! I'm thinking of a number between 1 and 20. Can you guess it? type your guess below or type 'exit' to end the game.")
-    number = random.randint(1, 20)
-    attempts = 0
+    number = random.randint(1, 20) #picks the number
+    attempts = 0 #remembers the attempts
     guess = 21
-    while guess != number:
+    while guess != number: #checks if user's guess is the number
         guess = UserInput()
-        if guess.lower() == "exit":
+        if guess.lower() == "exit": #if the user wrote exit - exit
             BotMessage("Thanks for playing! Let's play again sometime.")
             return
-        try:
+        try:                #if didn't exit checks if the user input was a number
             guess = int(guess)
             attempts += 1
-        except ValueError:
+        except ValueError:   # if user input isn't a number:
             BotMessage("Please enter a valid number.")
             continue
-        if guess < number:
+        if guess < number:   #if user input is a number shows one of those two things
             BotMessage("Too low! Try again.")
         elif guess > number:
             BotMessage("Too high! Try again.")
-    BotMessage(f"Congratulations! You've guessed the number {number} in {attempts} attempts!")
+    BotMessage(f"Congratulations! You've guessed the number {number} in {attempts} attempts!")  # once the guess is correct shows this
     print("type 'exit' to end the game or anything else to play again...")
     if UserInput().lower() != "exit":
         NumberGuessingGame()
 
-def analyze_mood(user_input):
+def analyze_mood(user_input): #checks if the sentence is included with good words or bad words
     for word in happyWords:
         if word in user_input:
             BotMessage("I'm glad to hear that! Keep up the positive vibes!")
@@ -105,13 +105,13 @@ def analyze_mood(user_input):
             return
     BotMessage("seems like you're feeling neutral. If you want to share more about how you're feeling, I'm here to listen.")
 
-def strip_punctuation(text):
+def strip_punctuation(text):  #removes punctuation so tha the code can ignore theme in the getresponse func
     punctuation = '''!()-[]{};:'",<>./?@#$%^&*_~'''
     for char in punctuation:
         text = text.replace(char, "")
     return text.lower()
 
-def calculate(expression):
+def calculate(expression):  #uses eval to calc a math expression
     # Only allow numbers, operators, spaces, decimals, and parentheses
     if not re.match(r'^[\d\s\+\-\*\/\.\(\)]+$', expression):
         BotMessage("I can only calculate math expressions! (e.g. 5 + 3 =)")
@@ -119,6 +119,7 @@ def calculate(expression):
     try:
         result = eval(expression)
         BotMessage(f"The answer is: {result}")
+    #error handling
     except ZeroDivisionError:
         BotMessage("You can't divide by zero!")
     except Exception:
@@ -150,7 +151,7 @@ def GetResponse(userInput):
         mood_input = UserInput()
         analyze_mood(mood_input)
     else:
-        BotMessage(random.choice(default_responses))
+        BotMessage(random.choice(default_responses)) #if the bot didn't understand user input
 
 
 def chat():
