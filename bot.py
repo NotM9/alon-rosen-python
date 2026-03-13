@@ -1,11 +1,14 @@
 import random
+import re
+import time
+import sys
 
 botName = "guy"
 userName = ""
+messages = 0
 
 greetings = ["hi", "hello", "hey", "greetings", "what's up", "howdy"]
-default_responses = ["That's interesting!","Tell me more!","I see...","Cool!","Thanks for sharing!"
-    ]
+default_responses = ["That's interesting!","Tell me more!","I see...","Cool!","Thanks for sharing!"]
 howAreYou = ["how are you", "hows it going", "whats up", "sup", "hows your day"]
 askingForName = ["what's your name?", "who are you?", "what should I call you?"]
 goodbyes = ["bye", "goodbye", "see you later", "farewell", "take care"]
@@ -21,13 +24,22 @@ happyWords = ["happy", "joy", "excited", "glad", "pleased"]
 sadWords = ["sad", "unhappy", "depressed", "down", "miserable", "angry"]
 
 
-
 def seperator():
     print("=" * 100)
 
 def BotMessage(message):
-    print(f"🤖 {botName}: {message}")
+    prefix = f"🤖 {botName}: "
+    sys.stdout.write(prefix)
+    sys.stdout.flush()
+    for char in str(message):
+        sys.stdout.write(char)
+        sys.stdout.flush()
+        time.sleep(0.03)
+    print()
+
 def UserInput():
+    global messages
+    messages += 1
     return input(f"👤 {userName}: ")
 
 def show_help():
@@ -36,10 +48,11 @@ def show_help():
     print("tell a joke \n ask a riddle \n play games \n calculate a number(end the equation in '=') \n analyze your mood \n you can say 'help' to see this message again \n you can say 'exit' to end the conversation")
 
 def GreetUser():
+    global userName
     greeting = random.choice(greetings)
     BotMessage(f"{greeting} I'm {botName}, your friendly chatbot!")
     print(random.choice(askingForName))
-    userName = input ("👤 You: ")
+    userName = input("👤 You: ")
     BotMessage(f"Nice to meet you, {userName}! How can I assist you today?")
 
 def TellJoke():
@@ -98,6 +111,19 @@ def strip_punctuation(text):
         text = text.replace(char, "")
     return text.lower()
 
+def calculate(expression):
+    # Only allow numbers, operators, spaces, decimals, and parentheses
+    if not re.match(r'^[\d\s\+\-\*\/\.\(\)]+$', expression):
+        BotMessage("I can only calculate math expressions! (e.g. 5 + 3 =)")
+        return
+    try:
+        result = eval(expression)
+        BotMessage(f"The answer is: {result}")
+    except ZeroDivisionError:
+        BotMessage("You can't divide by zero!")
+    except Exception:
+        BotMessage("That doesn't look like a valid math expression.")
+
 def GetResponse(userInput):
     strippedInput = strip_punctuation(userInput)
     if any(greeting in strippedInput for greeting in greetings):
@@ -118,14 +144,13 @@ def GetResponse(userInput):
         BotMessage("Goodbye! It was nice chatting with you.")
         exit()
     elif "=" in userInput:
-        BotMessage(eval(userInput[:-1]))
+        calculate(userInput[:-1])
     elif "analyze mood" in strippedInput:
         BotMessage("Sure! Please tell me how you're feeling.")
         mood_input = UserInput()
         analyze_mood(mood_input)
     else:
         BotMessage(random.choice(default_responses))
-    
 
 
 def chat():
@@ -137,10 +162,10 @@ def chat():
             continue
         if userInput.lower() == "exit":
             BotMessage(f"{random.choice(goodbyes)} {userName}! It was nice chatting with you.")
+            BotMessage(f"we exchanged {messages} messages")
             break
         GetResponse(userInput)
 
 
-
 if __name__ == "__main__":
-    chat()    
+    chat()
